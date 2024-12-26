@@ -27,7 +27,7 @@ class Conversation(models.Model):
         return f"Chat {self.conversation_id}"
 
 
-class ChatMessage(models.Model):
+class Message(models.Model):
     """Model for messages within conversations"""
     message_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     conversation = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
