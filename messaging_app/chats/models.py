@@ -1,33 +1,42 @@
-from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import AbstractUser
+import uuid
 
 
-# Custom User Model
 class CustomUser(AbstractUser):
-    name = models.TextField(blank=True)
-    bio = models.TextField(blank=True)
-    # profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
+    """Custom user model extending AbstractUser"""
+    user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    email = models.EmailField(unique=True)
+    password = models.CharField(max_length=128)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    phone_number = models.CharField(max_length=15)
 
     def __str__(self):
         return self.username
 
 
-# Conversation Model
-class Conversation(models.Model):
-    participants = models.ManyToManyField(CustomUser, related_name='conversations')
+class ChatRoom(models.Model):
+    """Model for conversations between users"""
+    conversation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    participants = models.ManyToManyField(CustomUser, related_name='chat_rooms')
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Conversation {self.id}"
+        return f"Chat {self.conversation_id}"
 
 
-# Message Model
-class Message(models.Model):
-    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
-    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='sent_messages')
-    content = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
+class ChatMessage(models.Model):
+    """Model for messages within conversations"""
+    message_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    conversation = models.ForeignKey(ChatRoom, on_delete=models.CASCADE)
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    message_body = models.TextField()
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['sent_at']
 
     def __str__(self):
-        return f"{self.sender.username}: {self.content[:20]}"
+        return f"{self.sender.username}: {self.message_body[:50]}..."
