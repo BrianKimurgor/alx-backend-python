@@ -27,5 +27,6 @@ router.register(r'messages', MessageViewSet)
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
+    path('api/', include('chats.urls')),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
