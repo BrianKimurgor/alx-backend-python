@@ -16,7 +16,7 @@ class CustomUser(AbstractUser):
         return self.username
 
 
-class ChatRoom(models.Model):
+class Conversation(models.Model):
     """Model for conversations between users"""
     conversation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     participants = models.ManyToManyField(CustomUser, related_name='chat_rooms')
